@@ -1,0 +1,7 @@
+{
+  "name": "LastMessage",
+  "version": "1.0.0",
+  "description": "After pressing the set key it will add the last message to the current message.",
+  "author": "Adam Turaj",
+  "license": "MIT"
+}
