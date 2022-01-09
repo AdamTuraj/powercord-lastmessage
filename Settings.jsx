@@ -15,7 +15,7 @@ module.exports = ({ getSetting, updateSetting, toggleSetting }) => (
     </SwitchItem>
     <KeybindRecorder
       note="The keybind to insert your last message."
-      value={getSetting("keybind", "down")}
+      value={getSetting("keybind", "Down")}
       required={true}
       onChange={(val) => updateSetting("keybind", val)}
     >

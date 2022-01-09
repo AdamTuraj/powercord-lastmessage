@@ -1,6 +1,6 @@
 const { Plugin } = require("powercord/entities");
 const { getModule, channels } = require("powercord/webpack");
-const { getMessages } = getModule(["getMessages"], false);
+const { getRawMessages } = getModule(["getRawMessages"], false);
 const { getCurrentUser } = getModule(["getCurrentUser"], false);
 
 const { ComponentDispatch } = getModule(["ComponentDispatch"], false);
@@ -17,13 +17,12 @@ module.exports = class LastMessage extends Plugin {
   };
 
   getTextBox() {
-    return document.querySelector(
-      "#app-mount > div.app-1q1i1E > div > div.layers-3iHuyZ.layers-3q14ss > div > div > div > div > div.chat-3bRxxu > div.content-yTz4x3 > main > form > div > div > div > div > div > div.textArea-12jD-V.textAreaSlate-1ZzRVj.slateContainer-3Qkn2x > div.markup-2BOw-j.slateTextArea-1Mkdgw.fontSize16Padding-3Wk7zP"
-    );
+    // Idk why they made this super difficult
+    return document.getElementsByClassName("slateTextArea-27tjG0")[0];
   }
 
   getLastMessage() {
-    const msgs = getMessages(channels.getChannelId()).toArray();
+    const msgs = Object.values(getRawMessages(channels.getChannelId()));
 
     if (!this.current_user_id) {
       this.current_user_id = getCurrentUser().id;
@@ -34,7 +33,7 @@ module.exports = class LastMessage extends Plugin {
     );
 
     if (last_msg.length) {
-      return last_msg.pop();
+      return last_msg[0];
     }
   }
 
@@ -66,7 +65,7 @@ module.exports = class LastMessage extends Plugin {
 
     document.addEventListener("keydown", (event) => {
       const keybinds = this.settings
-        .get("keybind", ["down"])
+        .get("keybind", ["Down"])
         .split("+")
         .map((keybind) => keybind.toLowerCase());
 
