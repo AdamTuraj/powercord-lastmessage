@@ -9,11 +9,12 @@ const Settings = require("./Settings");
 
 module.exports = class LastMessage extends Plugin {
   keys_pressed = [];
-  arrow_replacements = {
+  key_replacements = {
     ArrowUp: "up",
     ArrowRight: "right",
     ArrowDown: "down",
     ArrowLeft: "left",
+    Control: "ctrl",
   };
 
   getTextBox() {
@@ -47,8 +48,11 @@ module.exports = class LastMessage extends Plugin {
 
   checkIfAddKey(key, keybind) {
     if (this.keys_pressed.length !== keybind.length) {
+      console.log(key);
       if (this.maybeAddKey(key, keybind)) {
+        console.log("1");
         if (this.keys_pressed.length === keybind.length) {
+          console.log("2");
           return true;
         }
       }
@@ -65,9 +69,11 @@ module.exports = class LastMessage extends Plugin {
 
     document.addEventListener("keydown", (event) => {
       const keybinds = this.settings
-        .get("keybind", ["Down"])
+        .get("keybind", "Down")
         .split("+")
         .map((keybind) => keybind.toLowerCase());
+
+      console.log(keybinds);
 
       if (!this.settings.get("enabled", true) || !keybinds.length) {
         return;
@@ -75,12 +81,13 @@ module.exports = class LastMessage extends Plugin {
 
       if (
         !this.checkIfAddKey(
-          this.arrow_replacements[event.key]
-            ? this.arrow_replacements[event.key]
+          this.key_replacements[event.key]
+            ? this.key_replacements[event.key]
             : event.key.toLowerCase(),
           keybinds
         )
       ) {
+        console.log("Nope");
         return;
       }
 
