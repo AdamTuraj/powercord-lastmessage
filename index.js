@@ -48,11 +48,8 @@ module.exports = class LastMessage extends Plugin {
 
   checkIfAddKey(key, keybind) {
     if (this.keys_pressed.length !== keybind.length) {
-      console.log(key);
       if (this.maybeAddKey(key, keybind)) {
-        console.log("1");
         if (this.keys_pressed.length === keybind.length) {
-          console.log("2");
           return true;
         }
       }
@@ -73,8 +70,6 @@ module.exports = class LastMessage extends Plugin {
         .split("+")
         .map((keybind) => keybind.toLowerCase());
 
-      console.log(keybinds);
-
       if (!this.settings.get("enabled", true) || !keybinds.length) {
         return;
       }
@@ -87,7 +82,6 @@ module.exports = class LastMessage extends Plugin {
           keybinds
         )
       ) {
-        console.log("Nope");
         return;
       }
 
