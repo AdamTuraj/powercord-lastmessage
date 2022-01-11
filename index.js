@@ -1,6 +1,6 @@
 const { Plugin } = require("powercord/entities");
 const { getModule, channels } = require("powercord/webpack");
-const { getRawMessages } = getModule(["getRawMessages"], false);
+const { getMessages } = getModule(["getRawMessages"], false);
 const { getCurrentUser } = getModule(["getCurrentUser"], false);
 
 const { ComponentDispatch } = getModule(["ComponentDispatch"], false);
@@ -17,13 +17,28 @@ module.exports = class LastMessage extends Plugin {
     Control: "ctrl",
   };
 
+  special_keys = {
+    ctrl: (e) => {
+      return e.ctrlKey;
+    },
+    meta: (e) => {
+      return e.metaKey;
+    },
+    alt: (e) => {
+      return e.altKey;
+    },
+    shift: (e) => {
+      return e.shiftKey;
+    },
+  };
+
   getTextBox() {
     // Idk why they made this super difficult
     return document.getElementsByClassName("slateTextArea-27tjG0")[0];
   }
 
   getLastMessage() {
-    const msgs = Object.values(getRawMessages(channels.getChannelId()));
+    const msgs = getMessages(channels.getChannelId()).toArray();
 
     if (!this.current_user_id) {
       this.current_user_id = getCurrentUser().id;
@@ -34,11 +49,34 @@ module.exports = class LastMessage extends Plugin {
     );
 
     if (last_msg.length) {
-      return last_msg[0];
+      return last_msg.pop();
     }
   }
 
+  isSpecialKey(key) {
+    return !!this.special_keys[key];
+  }
+
+  specialKeysPressed(keybind, e) {
+    let special_keys_pressed = 0;
+    Object.keys(this.special_keys).forEach((key) => {
+      if (this.special_keys[key](e)) {
+        if (!keybind.includes(key)) {
+          special_keys_pressed += 6942069;
+        } else {
+          special_keys_pressed += 1;
+        }
+      }
+    });
+
+    return special_keys_pressed;
+  }
+
   maybeAddKey(key, keybind) {
+    if (this.isSpecialKey(key)) {
+      return true;
+    }
+
     if (keybind.includes(key) && !this.keys_pressed.includes(key)) {
       this.keys_pressed.push(key);
       return true;
@@ -46,10 +84,16 @@ module.exports = class LastMessage extends Plugin {
     return false;
   }
 
-  checkIfAddKey(key, keybind) {
-    if (this.keys_pressed.length !== keybind.length) {
+  checkIfAddKey(key, keybind, e) {
+    if (
+      this.keys_pressed.length + this.specialKeysPressed(keybind, e) !==
+      keybind.length
+    ) {
       if (this.maybeAddKey(key, keybind)) {
-        if (this.keys_pressed.length === keybind.length) {
+        if (
+          this.keys_pressed.length + this.specialKeysPressed(keybind, e) ===
+          keybind.length
+        ) {
           return true;
         }
       }
@@ -79,7 +123,8 @@ module.exports = class LastMessage extends Plugin {
           this.key_replacements[event.key]
             ? this.key_replacements[event.key]
             : event.key.toLowerCase(),
-          keybinds
+          keybinds,
+          event
         )
       ) {
         return;
@@ -89,7 +134,14 @@ module.exports = class LastMessage extends Plugin {
 
       const last_msg = this.getLastMessage();
 
-      if (document.activeElement !== this.getTextBox() || !last_msg) {
+      const placeholder =
+        document.getElementsByClassName("placeholder-1_mJY1")[0];
+
+      if (
+        document.activeElement !== this.getTextBox() ||
+        !last_msg ||
+        !placeholder
+      ) {
         return;
       }
 
@@ -99,7 +151,11 @@ module.exports = class LastMessage extends Plugin {
     });
 
     document.addEventListener("keyup", (event) => {
-      const index = this.keys_pressed.indexOf(event.key);
+      const index = this.keys_pressed.indexOf(
+        this.key_replacements[event.key]
+          ? this.key_replacements[event.key]
+          : event.key.toLowerCase()
+      );
 
       if (index !== -1) {
         this.keys_pressed.pop(index);
