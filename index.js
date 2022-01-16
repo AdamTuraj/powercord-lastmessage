@@ -34,7 +34,7 @@ module.exports = class LastMessage extends Plugin {
 
   getTextBox() {
     // Idk why they made this super difficult
-    return document.getElementsByClassName("slateTextArea-27tjG0")[0];
+    return document.getElementsByClassName("slateTextArea-27tjG0").pop();
   }
 
   getLastMessage() {
@@ -136,6 +136,8 @@ module.exports = class LastMessage extends Plugin {
 
       const placeholder =
         document.getElementsByClassName("placeholder-1_mJY1")[0];
+
+      console.log(document.activeElement);
 
       if (
         document.activeElement !== this.getTextBox() ||
