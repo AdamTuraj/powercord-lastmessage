@@ -137,8 +137,6 @@ module.exports = class LastMessage extends Plugin {
       const placeholder =
         document.getElementsByClassName("placeholder-1_mJY1")[0];
 
-      console.log(document.activeElement);
-
       if (
         document.activeElement !== this.getTextBox() ||
         !last_msg ||
