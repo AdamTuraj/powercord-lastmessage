@@ -1,3 +1,5 @@
+> :warning: **This project is no longer being developed due to the deprecation of Powercord**
+
 # Last Message
 
 Get your last message sent using customizable keybinds!
